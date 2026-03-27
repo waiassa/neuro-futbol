@@ -210,9 +210,8 @@ async function loadSchedules(){
     document.querySelectorAll('.register').forEach((btn) => {
       btn.onclick = async () => {
         const scheduleId = btn.dataset.id;
-        const parentEmail = prompt('Email del padre/tutor:');
-        const childName = prompt('Nombre del niño:');
-        if(!parentEmail || !childName) return alert('Datos incompletos');
+        const parentEmail = `${session.username}@familia.neurofutbol.local`;
+        const childName = session.username;
         const { error: regError } = await supabase.rpc('register_family', {
           p_username: session.username,
           p_pin: session.pin,
@@ -221,7 +220,7 @@ async function loadSchedules(){
           p_child_name: childName
         });
         if(regError) return alert(regError.message);
-        alert('Inscripción registrada');
+        alert('Turno reservado');
         loadSchedules();
       };
     });
