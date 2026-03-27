@@ -238,7 +238,7 @@ function renderScheduleCard(container, schedule, count, showRegister){
   el.appendChild(title);
 
   const info = document.createElement('span');
-  info.textContent = ` — ${formatScheduleLabel(schedule)} — ${count} inscritos`;
+  info.textContent = ` — ${formatScheduleLabel(schedule)} — ${count} inscriptos`;
   el.appendChild(info);
 
   if(showRegister){
