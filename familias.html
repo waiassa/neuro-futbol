@@ -9,14 +9,26 @@
 <body data-role="parent">
   <header>
     <h1>Turnos para Familias</h1>
-    <p>Seleccioná un turno y completá la inscripción.</p>
+    <p>Ingresá con tu usuario y código para ver turnos de tu categoría.</p>
     <nav><a href="index.html">Volver</a></nav>
   </header>
 
   <main>
+    <section id="familyLoginPanel">
+      <h2>Acceso familias</h2>
+      <div class="form-row">
+        <input id="familyUsername" placeholder="usuario familia">
+        <input id="familyPin" placeholder="código 4 dígitos" inputmode="numeric" maxlength="4">
+        <button id="familyLoginBtn">Ingresar</button>
+        <button id="familyLogoutBtn" type="button">Salir</button>
+      </div>
+      <small id="familySessionStatus"></small>
+    </section>
+
     <section class="toolbar">
       <button id="reloadBtn">Actualizar turnos</button>
     </section>
+
     <section id="schedules"></section>
   </main>
 

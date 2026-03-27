@@ -9,7 +9,7 @@
 <body data-role="admin">
   <header>
     <h1>Panel Admin</h1>
-    <p>Iniciá sesión para gestionar turnos.</p>
+    <p>Iniciá sesión para gestionar turnos y usuarios de familias.</p>
     <nav><a href="index.html">Volver</a></nav>
   </header>
 
@@ -38,6 +38,16 @@
         <input id="newDay" placeholder="Día (Lunes)">
         <input id="newTime" placeholder="Horario (18:30)">
         <button id="addScheduleBtn">Agregar turno</button>
+      </div>
+    </section>
+
+    <section id="familyAdminPanel">
+      <h2>Alta de usuario familia</h2>
+      <div class="form-row">
+        <input id="familyNewUsername" placeholder="usuario familia">
+        <input id="familyNewPin" placeholder="código 4 dígitos" inputmode="numeric" maxlength="4">
+        <input id="familyNewCategory" placeholder="categoría (ej. 2016)">
+        <button id="createFamilyBtn">Guardar usuario</button>
       </div>
     </section>
   </main>
