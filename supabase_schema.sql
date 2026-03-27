@@ -23,8 +23,7 @@ set password_hash = excluded.password_hash;
 create table if not exists public.schedules (
   id uuid primary key default gen_random_uuid(),
   category text not null,
-  day text not null,
-  time text not null,
+  start_at timestamptz not null,
   created_at timestamptz not null default now()
 );
 
@@ -96,12 +95,15 @@ $$;
 grant execute on function public.verify_admin_login(text, text) to anon;
 
 -- Admin RPC controlled by username + password
+drop function if exists public.admin_add_schedule(text, text, text, text, text);
+drop function if exists public.admin_add_schedule(text, text, text, text);
+drop function if exists public.admin_add_schedule(text, text, text, timestamptz);
+
 create or replace function public.admin_add_schedule(
   p_username text,
   p_password text,
   p_category text,
-  p_day text,
-  p_time text
+  p_start_at timestamptz
 )
 returns public.schedules
 language plpgsql
@@ -115,15 +117,15 @@ begin
     raise exception 'Usuario o contraseña inválidos';
   end if;
 
-  insert into public.schedules(category, day, time)
-  values (coalesce(p_category, ''), coalesce(p_day, ''), coalesce(p_time, ''))
+  insert into public.schedules(category, start_at)
+  values (coalesce(p_category, ''), p_start_at)
   returning * into v_row;
 
   return v_row;
 end;
 $$;
 
-grant execute on function public.admin_add_schedule(text, text, text, text, text) to anon;
+grant execute on function public.admin_add_schedule(text, text, text, timestamptz) to anon;
 
 create or replace function public.family_login(
   p_username text,
@@ -187,7 +189,7 @@ create or replace function public.get_family_schedules(
   p_username text,
   p_pin text
 )
-returns table(id uuid, category text, day text, "time" text, total bigint, is_registered boolean)
+returns table(id uuid, category text, start_at timestamptz, total bigint, is_registered boolean)
 language sql
 security definer
 set search_path = public
@@ -201,18 +203,17 @@ as $$
   select
     s.id,
     s.category,
-    s.day,
-    s.time,
+    s.start_at,
     coalesce(count(r.id), 0)::bigint as total,
-    bool_or(
+    coalesce(bool_or(
       r.child_name = p_username
       and r.parent_email = (p_username || '@familia.neurofutbol.local')
-    ) as is_registered
+    ), false) as is_registered
   from public.schedules s
   join fam on fam.category = s.category
   left join public.registrations r on r.schedule_id = s.id
-  group by s.id, s.category, s.day, s.time, s.created_at
-  order by s.created_at asc;
+  group by s.id, s.category, s.start_at, s.created_at
+  order by s.start_at asc, s.created_at asc;
 $$;
 
 grant execute on function public.get_family_schedules(text, text) to anon;

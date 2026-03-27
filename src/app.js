@@ -5,6 +5,23 @@ const FAMILY_SESSION_KEY = 'neuro_futbol_family_session';
 
 function qs(sel){ return document.querySelector(sel); }
 
+function formatScheduleLabel(schedule){
+  if(schedule && schedule.start_at){
+    const dt = new Date(schedule.start_at);
+    if(!Number.isNaN(dt.getTime())){
+      return new Intl.DateTimeFormat('es-AR', {
+        weekday: 'short',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(dt);
+    }
+  }
+  return `${String(schedule.day || '')} ${String(schedule.time || '')}`.trim();
+}
+
 function getRole(){
   return document.body.dataset.role || 'parent';
 }
@@ -155,7 +172,7 @@ function renderScheduleCard(container, schedule, count, showRegister){
   el.appendChild(title);
 
   const info = document.createElement('span');
-  info.textContent = ` — ${String(schedule.day || '')} ${String(schedule.time || '')} — ${count} inscritos`;
+  info.textContent = ` — ${formatScheduleLabel(schedule)} — ${count} inscritos`;
   el.appendChild(info);
 
   if(showRegister){
@@ -243,7 +260,7 @@ async function loadSchedules(){
   }
 
   const [schedulesRes, countsRes] = await Promise.all([
-    supabase.from('schedules').select('id, category, day, time, created_at').order('created_at', { ascending: true }),
+    supabase.from('schedules').select('id, category, start_at, created_at').order('start_at', { ascending: true }).order('created_at', { ascending: true }),
     supabase.rpc('get_schedule_counts')
   ]);
   if(schedulesRes.error){
@@ -265,9 +282,11 @@ async function addSchedule(){
   if(!session) return alert('Primero iniciá sesión de admin');
 
   const category = qs('#newCategory').value.trim();
-  const day = qs('#newDay').value.trim();
+  const date = qs('#newDate').value.trim();
   const time = qs('#newTime').value.trim();
-  if(!category || !day || !time) return alert('Completa todos los campos');
+  if(!category || !date || !time) return alert('Completa categoría, fecha y hora');
+  const startAt = new Date(`${date}T${time}:00`);
+  if(Number.isNaN(startAt.getTime())) return alert('Fecha u hora inválida');
 
   if(!isConfigured()) return alert('Configurá Supabase en src/app.js');
 
@@ -276,8 +295,7 @@ async function addSchedule(){
     p_username: session.username,
     p_password: session.password,
     p_category: category,
-    p_day: day,
-    p_time: time
+    p_start_at: startAt.toISOString()
   });
 
   if(error) return alert(error.message);
