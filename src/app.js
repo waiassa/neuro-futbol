@@ -384,9 +384,14 @@ async function addSchedule(){
 
   const category = qs('#newCategory').value.trim();
   const date = qs('#newDate').value.trim();
-  const time = qs('#newTime').value.trim();
-  if(!category || !date || !time) return alert('Completa categoría, fecha y hora');
-  if(!/^\d{2}:00$/.test(time)) return alert('Solo se permiten horarios en punto (ej: 09:00, 13:00)');
+  const hourRaw = qs('#newHour') ? qs('#newHour').value.trim() : '';
+  if(!category || !date || !hourRaw) return alert('Completa categoría, fecha y hora');
+  if(!/^\d{1,2}$/.test(hourRaw)) return alert('Ingresá una hora válida entre 0 y 23');
+  const hourNum = Number(hourRaw);
+  if(!Number.isInteger(hourNum) || hourNum < 0 || hourNum > 23){
+    return alert('Ingresá una hora válida entre 0 y 23');
+  }
+  const time = `${String(hourNum).padStart(2, '0')}:00`;
   const startAt = new Date(`${date}T${time}:00`);
   if(Number.isNaN(startAt.getTime())) return alert('Fecha u hora inválida');
 
