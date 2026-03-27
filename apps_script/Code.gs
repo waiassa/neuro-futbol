@@ -6,17 +6,42 @@ function _getSheet(name){
   return ss.getSheetByName(name);
 }
 
+function _json(data){
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function _routeFromRequest(e){
+  const routeParam = e && e.parameter && e.parameter.route ? String(e.parameter.route).trim().toLowerCase() : '';
+  if(routeParam) return routeParam;
+  const raw = (e && e.pathInfo ? String(e.pathInfo) : '').trim().toLowerCase();
+  if(!raw) return '';
+  return raw.split('/')[0];
+}
+
+function _isAllowedOp(route, op){
+  const parentOps = { getSchedules:true, getCounts:true, register:true };
+  const adminOps = { adminAddSchedule:true };
+  if(route === 'parent') return !!parentOps[op];
+  if(route === 'admin') return !!adminOps[op];
+  return false;
+}
+
 function doGet(e){
   const op = e.parameter.op || '';
+  const route = _routeFromRequest(e);
   try{
-    if(op === 'getSchedules') return ContentService.createTextOutput(JSON.stringify(getSchedules())).setMimeType(ContentService.MimeType.JSON);
-    if(op === 'getCounts') return ContentService.createTextOutput(JSON.stringify(getCounts())).setMimeType(ContentService.MimeType.JSON);
-    if(op === 'register') return ContentService.createTextOutput(JSON.stringify(register(e.parameter))).setMimeType(ContentService.MimeType.JSON);
-    if(op === 'adminAddSchedule') return ContentService.createTextOutput(JSON.stringify(adminAddSchedule(e.parameter))).setMimeType(ContentService.MimeType.JSON);
+    if(!route) return _json({error:'Ruta inválida. Usa route=parent o route=admin'});
+    if(!_isAllowedOp(route, op)) return _json({error:'Operación no permitida para esta ruta'});
+    if(op === 'getSchedules') return _json(getSchedules());
+    if(op === 'getCounts') return _json(getCounts());
+    if(op === 'register') return _json(register(e.parameter));
+    if(op === 'adminAddSchedule') return _json(adminAddSchedule(e.parameter));
   }catch(err){
-    return ContentService.createTextOutput(JSON.stringify({error:err.message})).setMimeType(ContentService.MimeType.JSON);
+    return _json({error:err.message});
   }
-  return ContentService.createTextOutput(JSON.stringify({error:'op no reconocido'})).setMimeType(ContentService.MimeType.JSON);
+  return _json({error:'op no reconocido'});
 }
 
 function getSchedules(){
@@ -64,4 +89,27 @@ function adminAddSchedule(params){
   const id = String(new Date().getTime());
   sh.appendRow([id, params.category||'', params.day||'', params.time||'']);
   return { success:true, message:'Turno agregado', id:id };
+}
+
+// Helper: establecer el permiso de la hoja activa como "Anyone with link can edit".
+// Ejecuta esta función desde el editor de Apps Script (requiere autorización).
+function makeSheetPublicEditable(){
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var id = ss.getId();
+  var file = DriveApp.getFileById(id);
+  file.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.EDIT);
+  return { success:true, message: 'Sheet set to anyone with link can edit', id: id };
+}
+
+// Ejecuta esta función desde el editor de Apps Script para introducir la clave
+// ADMIN_KEY de forma interactiva (no la pongas en el repositorio).
+function setAdminKeyFromPrompt(){
+  var ui = SpreadsheetApp.getUi();
+  var resp = ui.prompt('ADMIN_KEY', 'Introduce la ADMIN_KEY (no la compartas):', ui.ButtonSet.OK_CANCEL);
+  if(resp.getSelectedButton() != ui.Button.OK) return { success:false, message:'Cancelado' };
+  var key = resp.getResponseText();
+  if(!key) return { success:false, message:'Clave vacía' };
+  PropertiesService.getScriptProperties().setProperty('ADMIN_KEY', key);
+  ui.alert('ADMIN_KEY guardada correctamente');
+  return { success:true, message:'ADMIN_KEY guardada' };
 }

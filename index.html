@@ -3,38 +3,26 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Agenda - Centro de Entrenamiento</title>
+  <title>Neuro Futbol - Acceso</title>
   <link rel="stylesheet" href="src/styles.css">
 </head>
 <body>
   <header>
-    <h1>Agenda - Centro de Entrenamiento</h1>
-    <p>Frontend para uso en GitHub Pages + Google Sheets (Apps Script)</p>
+    <h1>Neuro Futbol</h1>
+    <p>Elegí el acceso según tu perfil.</p>
   </header>
 
   <main>
-    <section id="controls">
-      <label>API base (web app URL): <input id="apiBase" placeholder="https://script.google.com/macros/s/..../exec"></label>
-      <button id="loadBtn">Cargar turnos</button>
-    </section>
-
-    <section id="schedules">
-      <!-- listado de turnos se renderiza aquí -->
-    </section>
-
-    <section id="adminPanel">
-      <h2>Panel Admin (opcional)</h2>
-      <small>Usa `adminKey` en el Apps Script para proteger acciones administrativas.</small>
-      <div>
-        <input id="adminKey" placeholder="admin key">
-        <input id="newCategory" placeholder="Categoría (ej. 2016)">
-        <input id="newDay" placeholder="Día (Lunes)">
-        <input id="newTime" placeholder="Horario (18:30)">
-        <button id="addScheduleBtn">Agregar turno</button>
-      </div>
+    <section class="entry-grid">
+      <a class="entry-card" href="familias.html">
+        <h2>Familias</h2>
+        <p>Ver turnos e inscribir hijos.</p>
+      </a>
+      <a class="entry-card" href="admin.html">
+        <h2>Admin</h2>
+        <p>Administrar agenda y agregar turnos.</p>
+      </a>
     </section>
   </main>
-
-  <script src="src/app.js"></script>
 </body>
 </html>

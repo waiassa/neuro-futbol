@@ -11,6 +11,11 @@
 
 4) Deploy -> New deployment -> Select type "Web app". Ejecutar la app como: "Me" y acceso: "Anyone" o "Anyone, even anonymous" (según tu preferencia). Copiar la URL del Web App.
 
-5) En el frontend (`index.html`) pega la URL del Web App en la caja `API base` y clic en `Cargar turnos`.
+5) Usar rutas separadas por query sobre esa URL base:
+
+- URI familias: `https://.../exec?route=parent` (permite `getSchedules`, `getCounts`, `register`)
+- URI admin: `https://.../exec?route=admin` (permite `adminAddSchedule`)
+
+6) En el frontend (`index.html`) pega ambas URI y clic en `Cargar turnos`.
 
 Notas de seguridad: con acceso público cualquiera puede llamar `register`, por eso tener `ADMIN_KEY` protege solo las operaciones administrativas. Si quieres controlar usuarios (padres/administradores) deberás integrar Google Sign-In u otro método de autenticación y ajustar la lógica del Apps Script.
