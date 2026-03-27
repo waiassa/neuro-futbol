@@ -22,23 +22,7 @@
   </header>
 
   <main>
-    <section class="toolbar">
-      <button id="reloadBtn">Actualizar turnos</button>
-    </section>
-
-    <section id="schedules"></section>
-
-    <section id="calendarPanel">
-      <h2>Calendario mensual</h2>
-      <div class="calendar-toolbar">
-        <button id="calendarPrevBtn" type="button">Mes anterior</button>
-        <strong id="calendarMonthLabel"></strong>
-        <button id="calendarNextBtn" type="button">Mes siguiente</button>
-      </div>
-      <div id="adminCalendarGrid" class="calendar-grid"></div>
-    </section>
-
-    <section id="adminLoginPanel">
+    <section id="adminLoginPanel" class="login-gate">
       <h2>Acceso admin</h2>
       <div class="form-row">
         <input id="adminUsername" placeholder="usuario" value="admin">
@@ -49,25 +33,43 @@
       <small id="adminSessionStatus"></small>
     </section>
 
-    <section id="adminPanel">
-      <h2>Agregar turno</h2>
-      <div class="form-row">
-        <input id="newCategory" placeholder="Categoría (ej. 2016)">
-        <input id="newDate" type="date" placeholder="Fecha">
-        <input id="newTime" type="time" step="3600" placeholder="Hora en punto">
-        <button id="addScheduleBtn">Agregar turno</button>
-      </div>
-    </section>
+    <div id="adminProtected">
+      <section class="toolbar">
+        <button id="reloadBtn">Actualizar turnos</button>
+      </section>
 
-    <section id="familyAdminPanel">
-      <h2>Alta de usuario familia</h2>
-      <div class="form-row">
-        <input id="familyNewUsername" placeholder="usuario familia">
-        <input id="familyNewPin" placeholder="código 4 dígitos" inputmode="numeric" maxlength="4">
-        <input id="familyNewCategory" placeholder="categoría (ej. 2016)">
-        <button id="createFamilyBtn">Guardar usuario</button>
-      </div>
-    </section>
+      <section id="schedules"></section>
+
+      <section id="calendarPanel">
+        <h2>Calendario mensual</h2>
+        <div class="calendar-toolbar">
+          <button id="calendarPrevBtn" type="button">Mes anterior</button>
+          <strong id="calendarMonthLabel"></strong>
+          <button id="calendarNextBtn" type="button">Mes siguiente</button>
+        </div>
+        <div id="adminCalendarGrid" class="calendar-grid"></div>
+      </section>
+
+      <section id="adminPanel">
+        <h2>Agregar turno</h2>
+        <div class="form-row">
+          <input id="newCategory" placeholder="Categoría (ej. 2016)">
+          <input id="newDate" type="date" placeholder="Fecha">
+          <input id="newTime" type="time" step="3600" placeholder="Hora en punto">
+          <button id="addScheduleBtn">Agregar turno</button>
+        </div>
+      </section>
+
+      <section id="familyAdminPanel">
+        <h2>Alta de usuario familia</h2>
+        <div class="form-row">
+          <input id="familyNewUsername" placeholder="usuario familia">
+          <input id="familyNewPin" placeholder="código 4 dígitos" inputmode="numeric" maxlength="4">
+          <input id="familyNewCategory" placeholder="categoría (ej. 2016)">
+          <button id="createFamilyBtn">Guardar usuario</button>
+        </div>
+      </section>
+    </div>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>

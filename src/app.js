@@ -138,9 +138,15 @@ function updateAdminUi(){
   if(getRole() !== 'admin') return;
   const session = getAdminSession();
   const status = qs('#adminSessionStatus');
-  const panel = qs('#adminPanel');
+  const loginPanel = qs('#adminLoginPanel');
+  const protectedPanel = qs('#adminProtected');
+  const usernameInput = qs('#adminUsername');
+  const passwordInput = qs('#adminPassword');
   if(status) status.textContent = session ? `Conectado como ${session.username}` : 'No autenticado';
-  if(panel) panel.style.display = session ? 'block' : 'none';
+  if(loginPanel) loginPanel.style.display = session ? 'none' : 'block';
+  if(protectedPanel) protectedPanel.style.display = session ? 'block' : 'none';
+  if(!session && usernameInput) usernameInput.focus();
+  if(!session && passwordInput) passwordInput.value = '';
 }
 
 function updateFamilyUi(){
@@ -275,6 +281,10 @@ async function loadSchedules(){
   }
 
   const supabase = createClient();
+  if(role === 'admin' && !getAdminSession()){
+    updateAdminUi();
+    return;
+  }
   if(role === 'parent'){
     const session = getFamilySession();
     if(!session){
