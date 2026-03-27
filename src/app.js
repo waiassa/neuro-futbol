@@ -347,6 +347,7 @@ async function addSchedule(){
   const date = qs('#newDate').value.trim();
   const time = qs('#newTime').value.trim();
   if(!category || !date || !time) return alert('Completa categoría, fecha y hora');
+  if(!/^\d{2}:00$/.test(time)) return alert('Solo se permiten horarios en punto (ej: 09:00, 13:00)');
   const startAt = new Date(`${date}T${time}:00`);
   if(Number.isNaN(startAt.getTime())) return alert('Fecha u hora inválida');
 

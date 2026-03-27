@@ -116,6 +116,9 @@ begin
   if not public.verify_admin_login(p_username, p_password) then
     raise exception 'Usuario o contraseña inválidos';
   end if;
+  if date_part('minute', p_start_at) <> 0 or date_part('second', p_start_at) <> 0 then
+    raise exception 'Solo se permiten horarios en punto (minuto 00)';
+  end if;
 
   insert into public.schedules(category, start_at)
   values (coalesce(p_category, ''), p_start_at)
