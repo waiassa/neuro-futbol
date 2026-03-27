@@ -1,15 +1,25 @@
-# Agenda - Centro de Entrenamiento (GitHub Pages + Google Sheets)
+# Neuro Futbol (GitHub Pages + Supabase)
 
-Este repo contiene un frontend simple para publicar en GitHub Pages y un ejemplo de Google Apps Script (Web App) que usa una Google Sheet como base de datos.
+Frontend estático con dos accesos separados:
 
-Pasos resumidos:
+- `https://waiassa.github.io/neuro-futbol/familias.html`
+- `https://waiassa.github.io/neuro-futbol/admin.html`
 
-1. Crear una Google Sheet con hojas: `Categories`, `Schedules`, `Children`, `Registrations`.
-2. Añadir el script `apps_script/Code.gs` en el editor de Apps Script, configurar la `ADMIN_KEY` en Properties y desplegar como Web App (quien tenga el enlace puede ejecutar).
-3. Configurar en `src/app.js` la constante `SCRIPT_EXEC_URL` con la URL de tu Web App.
-4. El frontend publica dos accesos separados:
-   - `https://waiassa.github.io/neuro-futbol/familias.html` (usa `route=parent`)
-   - `https://waiassa.github.io/neuro-futbol/admin.html` (usa `route=admin`)
-5. Publicar el frontend en GitHub Pages (branch `gh-pages` o `main` + settings).
+## Setup rápido en Supabase
 
-Ver `apps_script/README_APPSCRIPT.md` para detalles de Sheets y despliegue.
+1. Crear un proyecto en Supabase.
+2. En SQL Editor, ejecutar el archivo `supabase_schema.sql`.
+3. Cambiar el valor de `admin_key` en la tabla `app_settings`.
+4. En `src/app.js`, configurar:
+   - `SUPABASE_URL`
+   - `SUPABASE_ANON_KEY`
+5. Publicar en GitHub Pages (branch `main` o `gh-pages`).
+
+## Qué hace cada acceso
+
+- `familias.html`: lista turnos + registra inscripciones.
+- `admin.html`: lista turnos + permite agregar turnos con `adminKey`.
+
+## Nota
+
+La carpeta `apps_script/` quedó como referencia histórica de la versión Google Sheets/Apps Script.
