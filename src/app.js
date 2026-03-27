@@ -102,6 +102,26 @@ function adminLogout(){
   updateAdminUi();
 }
 
+async function ensureAdminSession(){
+  let session = getAdminSession();
+  if(session) return session;
+
+  const username = qs('#adminUsername') ? qs('#adminUsername').value.trim() : '';
+  const password = qs('#adminPassword') ? qs('#adminPassword').value : '';
+  if(!username || !password) return null;
+
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('verify_admin_login', {
+    p_username: username,
+    p_password: password
+  });
+  if(error || !data) return null;
+
+  setAdminSession(username, password);
+  updateAdminUi();
+  return { username: username, password: password };
+}
+
 async function familyLogin(){
   const username = qs('#familyUsername') ? qs('#familyUsername').value.trim() : '';
   const pin = qs('#familyPin') ? qs('#familyPin').value.trim() : '';
@@ -227,7 +247,7 @@ async function loadSchedules(){
 }
 
 async function addSchedule(){
-  const session = getAdminSession();
+  const session = await ensureAdminSession();
   if(!session) return alert('Primero iniciá sesión de admin');
 
   const category = qs('#newCategory').value.trim();
@@ -253,7 +273,7 @@ async function addSchedule(){
 }
 
 async function createFamilyUser(){
-  const session = getAdminSession();
+  const session = await ensureAdminSession();
   if(!session) return alert('Primero iniciá sesión de admin');
   const familyUsername = qs('#familyNewUsername').value.trim();
   const familyPin = qs('#familyNewPin').value.trim();
