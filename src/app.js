@@ -2,6 +2,8 @@ const SUPABASE_URL = 'https://csioueutdscvjkltkyen.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4IddZb0z_QdO7t3pKCGwqg_kVrRMHXn';
 const ADMIN_SESSION_KEY = 'neuro_futbol_admin_session';
 const FAMILY_SESSION_KEY = 'neuro_futbol_family_session';
+let adminSessionMemory = null;
+let familySessionMemory = null;
 let adminSchedulesCache = [];
 let adminCalendarCursor = new Date();
 adminCalendarCursor.setDate(1);
@@ -97,41 +99,61 @@ function createClient(){
 function getAdminSession(){
   try{
     const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
-    if(!raw) return null;
+    if(!raw) return adminSessionMemory;
     const parsed = JSON.parse(raw);
-    if(!parsed || !parsed.username || !parsed.password) return null;
+    if(!parsed || !parsed.username || !parsed.password) return adminSessionMemory;
     return parsed;
   }catch(e){
-    return null;
+    return adminSessionMemory;
   }
 }
 
 function setAdminSession(username, password){
-  sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ username: username, password: password }));
+  adminSessionMemory = { username: username, password: password };
+  try{
+    sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(adminSessionMemory));
+  }catch(e){
+    // ignore storage errors; memory fallback keeps session for this tab
+  }
 }
 
 function clearAdminSession(){
-  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  adminSessionMemory = null;
+  try{
+    sessionStorage.removeItem(ADMIN_SESSION_KEY);
+  }catch(e){
+    // ignore storage errors
+  }
 }
 
 function getFamilySession(){
   try{
     const raw = sessionStorage.getItem(FAMILY_SESSION_KEY);
-    if(!raw) return null;
+    if(!raw) return familySessionMemory;
     const parsed = JSON.parse(raw);
-    if(!parsed || !parsed.username || !parsed.pin) return null;
+    if(!parsed || !parsed.username || !parsed.pin) return familySessionMemory;
     return parsed;
   }catch(e){
-    return null;
+    return familySessionMemory;
   }
 }
 
 function setFamilySession(username, pin){
-  sessionStorage.setItem(FAMILY_SESSION_KEY, JSON.stringify({ username: username, pin: pin }));
+  familySessionMemory = { username: username, pin: pin };
+  try{
+    sessionStorage.setItem(FAMILY_SESSION_KEY, JSON.stringify(familySessionMemory));
+  }catch(e){
+    // ignore storage errors; memory fallback keeps session for this tab
+  }
 }
 
 function clearFamilySession(){
-  sessionStorage.removeItem(FAMILY_SESSION_KEY);
+  familySessionMemory = null;
+  try{
+    sessionStorage.removeItem(FAMILY_SESSION_KEY);
+  }catch(e){
+    // ignore storage errors
+  }
 }
 
 function updateAdminUi(){
@@ -183,6 +205,7 @@ async function adminLogin(){
 
   setAdminSession(username, password);
   updateAdminUi();
+  loadSchedules();
   alert('Sesión iniciada');
 }
 
