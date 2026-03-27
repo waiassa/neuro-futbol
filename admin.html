@@ -9,7 +9,7 @@
 <body data-role="admin">
   <header>
     <h1>Panel Admin</h1>
-    <p>Gestioná turnos con tu clave administrativa.</p>
+    <p>Iniciá sesión para gestionar turnos.</p>
     <nav><a href="index.html">Volver</a></nav>
   </header>
 
@@ -20,10 +20,20 @@
 
     <section id="schedules"></section>
 
+    <section id="adminLoginPanel">
+      <h2>Acceso admin</h2>
+      <div class="form-row">
+        <input id="adminUsername" placeholder="usuario" value="admin">
+        <input id="adminPassword" type="password" placeholder="contraseña">
+        <button id="adminLoginBtn">Ingresar</button>
+        <button id="adminLogoutBtn" type="button">Salir</button>
+      </div>
+      <small id="adminSessionStatus"></small>
+    </section>
+
     <section id="adminPanel">
       <h2>Agregar turno</h2>
       <div class="form-row">
-        <input id="adminKey" placeholder="admin key">
         <input id="newCategory" placeholder="Categoría (ej. 2016)">
         <input id="newDay" placeholder="Día (Lunes)">
         <input id="newTime" placeholder="Horario (18:30)">

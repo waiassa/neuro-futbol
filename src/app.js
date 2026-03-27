@@ -1,5 +1,6 @@
 const SUPABASE_URL = 'https://csioueutdscvjkltkyen.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4IddZb0z_QdO7t3pKCGwqg_kVrRMHXn';
+const ADMIN_SESSION_KEY = 'neuro_futbol_admin_session';
 
 function qs(sel){ return document.querySelector(sel); }
 
@@ -13,6 +14,58 @@ function isConfigured(){
 
 function createClient(){
   return window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+}
+
+function getAdminSession(){
+  try{
+    const raw = sessionStorage.getItem(ADMIN_SESSION_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    if(!parsed || !parsed.username || !parsed.password) return null;
+    return parsed;
+  }catch(e){
+    return null;
+  }
+}
+
+function setAdminSession(username, password){
+  sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify({ username: username, password: password }));
+}
+
+function clearAdminSession(){
+  sessionStorage.removeItem(ADMIN_SESSION_KEY);
+}
+
+function updateAdminUi(){
+  if(getRole() !== 'admin') return;
+  const session = getAdminSession();
+  const status = qs('#adminSessionStatus');
+  const panel = qs('#adminPanel');
+  if(status) status.textContent = session ? `Conectado como ${session.username}` : 'No autenticado';
+  if(panel) panel.style.display = session ? 'block' : 'none';
+}
+
+async function adminLogin(){
+  const username = qs('#adminUsername') ? qs('#adminUsername').value.trim() : '';
+  const password = qs('#adminPassword') ? qs('#adminPassword').value : '';
+  if(!username || !password) return alert('Usuario y contraseña requeridos');
+
+  const supabase = createClient();
+  const { data, error } = await supabase.rpc('verify_admin_login', {
+    p_username: username,
+    p_password: password
+  });
+  if(error) return alert(error.message);
+  if(!data) return alert('Usuario o contraseña inválidos');
+
+  setAdminSession(username, password);
+  updateAdminUi();
+  alert('Sesión iniciada');
+}
+
+function adminLogout(){
+  clearAdminSession();
+  updateAdminUi();
 }
 
 function renderScheduleCard(container, schedule, count, showRegister){
@@ -103,8 +156,8 @@ async function loadSchedules(){
 }
 
 async function addSchedule(){
-  const key = qs('#adminKey').value.trim();
-  if(!key) return alert('Admin key requerida');
+  const session = getAdminSession();
+  if(!session) return alert('Primero iniciá sesión de admin');
 
   const category = qs('#newCategory').value.trim();
   const day = qs('#newDay').value.trim();
@@ -115,7 +168,8 @@ async function addSchedule(){
 
   const supabase = createClient();
   const { error } = await supabase.rpc('admin_add_schedule', {
-    p_admin_key: key,
+    p_username: session.username,
+    p_password: session.password,
     p_category: category,
     p_day: day,
     p_time: time
@@ -133,6 +187,14 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const addBtn = qs('#addScheduleBtn');
   if(addBtn) addBtn.addEventListener('click', addSchedule);
+
+  const loginBtn = qs('#adminLoginBtn');
+  if(loginBtn) loginBtn.addEventListener('click', adminLogin);
+
+  const logoutBtn = qs('#adminLogoutBtn');
+  if(logoutBtn) logoutBtn.addEventListener('click', adminLogout);
+
+  updateAdminUi();
 
   loadSchedules();
 });
