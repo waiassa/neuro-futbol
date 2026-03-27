@@ -149,8 +149,14 @@ function updateFamilyUi(){
   const status = qs('#familySessionStatus');
   const panel = qs('#familyLoginPanel');
   const container = qs('#schedules');
+  const usernameInput = qs('#familyUsername');
+  const pinInput = qs('#familyPin');
+  const loginBtn = qs('#familyLoginBtn');
   if(status) status.textContent = session ? `Conectado como ${session.username}` : 'No autenticado';
-  if(panel) panel.style.display = session ? 'none' : 'block';
+  if(panel) panel.style.display = 'block';
+  if(usernameInput) usernameInput.disabled = !!session;
+  if(pinInput) pinInput.disabled = !!session;
+  if(loginBtn) loginBtn.disabled = !!session;
   if(container && !session){
     container.innerHTML = '<p>Iniciá sesión para ver tus turnos.</p>';
   }
