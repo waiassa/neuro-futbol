@@ -161,9 +161,11 @@ function renderScheduleCard(container, schedule, count, showRegister){
   if(showRegister){
     el.appendChild(document.createElement('br'));
     const btn = document.createElement('button');
-    btn.className = 'register';
+    const isRegistered = !!schedule.is_registered;
+    btn.className = isRegistered ? 'cancel' : 'register';
     btn.dataset.id = schedule.id;
-    btn.textContent = 'Inscribir';
+    btn.dataset.action = isRegistered ? 'cancel' : 'register';
+    btn.textContent = isRegistered ? 'Borrar turno' : 'Inscribir';
     el.appendChild(btn);
   }
 
@@ -207,9 +209,22 @@ async function loadSchedules(){
     (data || []).forEach((s) => {
       renderScheduleCard(container, s, Number(s.total || 0), true);
     });
-    document.querySelectorAll('.register').forEach((btn) => {
+    document.querySelectorAll('.register, .cancel').forEach((btn) => {
       btn.onclick = async () => {
         const scheduleId = btn.dataset.id;
+        const action = btn.dataset.action || 'register';
+        if(action === 'cancel'){
+          const { error: delError } = await supabase.rpc('cancel_family_registration', {
+            p_username: session.username,
+            p_pin: session.pin,
+            p_schedule_id: scheduleId
+          });
+          if(delError) return alert(delError.message);
+          alert('Turno borrado');
+          loadSchedules();
+          return;
+        }
+
         const parentEmail = `${session.username}@familia.neurofutbol.local`;
         const childName = session.username;
         const { error: regError } = await supabase.rpc('register_family', {
