@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Agenda - Centro de Entrenamiento</title>
+  <link rel="stylesheet" href="src/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Agenda - Centro de Entrenamiento</h1>
+    <p>Frontend para uso en GitHub Pages + Google Sheets (Apps Script)</p>
+  </header>
+
+  <main>
+    <section id="controls">
+      <label>API base (web app URL): <input id="apiBase" placeholder="https://script.google.com/macros/s/..../exec"></label>
+      <button id="loadBtn">Cargar turnos</button>
+    </section>
+
+    <section id="schedules">
+      <!-- listado de turnos se renderiza aquí -->
+    </section>
+
+    <section id="adminPanel">
+      <h2>Panel Admin (opcional)</h2>
+      <small>Usa `adminKey` en el Apps Script para proteger acciones administrativas.</small>
+      <div>
+        <input id="adminKey" placeholder="admin key">
+        <input id="newCategory" placeholder="Categoría (ej. 2016)">
+        <input id="newDay" placeholder="Día (Lunes)">
+        <input id="newTime" placeholder="Horario (18:30)">
+        <button id="addScheduleBtn">Agregar turno</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="src/app.js"></script>
+</body>
+</html>
