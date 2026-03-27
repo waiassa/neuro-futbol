@@ -7,3 +7,12 @@ header{ margin-bottom:16px; }
 .schedule{ border:1px solid #ddd; border-radius:8px; padding:10px; margin:8px 0; }
 .form-row{ display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px; align-items:center; }
 input, button{ font:inherit; padding:8px; }
+.calendar-toolbar{ display:flex; gap:8px; align-items:center; margin:10px 0; flex-wrap:wrap; }
+.calendar-grid{ display:grid; grid-template-columns:repeat(7, minmax(120px, 1fr)); gap:8px; }
+.calendar-day{ border:1px solid #ddd; border-radius:8px; padding:8px; min-height:120px; }
+.calendar-day.muted{ opacity:.45; }
+.calendar-day-header{ font-size:12px; margin-bottom:6px; }
+.calendar-item{ font-size:12px; margin:4px 0; padding:4px 6px; background:#f4f4f4; border-radius:6px; }
+@media (max-width: 820px){
+  .calendar-grid{ grid-template-columns:repeat(2, minmax(140px, 1fr)); }
+}

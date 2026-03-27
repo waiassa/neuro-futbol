@@ -2,6 +2,9 @@ const SUPABASE_URL = 'https://csioueutdscvjkltkyen.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_4IddZb0z_QdO7t3pKCGwqg_kVrRMHXn';
 const ADMIN_SESSION_KEY = 'neuro_futbol_admin_session';
 const FAMILY_SESSION_KEY = 'neuro_futbol_family_session';
+let adminSchedulesCache = [];
+let adminCalendarCursor = new Date();
+adminCalendarCursor.setDate(1);
 
 function qs(sel){ return document.querySelector(sel); }
 
@@ -20,6 +23,63 @@ function formatScheduleLabel(schedule){
     }
   }
   return `${String(schedule.day || '')} ${String(schedule.time || '')}`.trim();
+}
+
+function dateKey(d){
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+}
+
+function renderAdminCalendar(schedules){
+  if(getRole() !== 'admin') return;
+  const grid = qs('#adminCalendarGrid');
+  const monthLabel = qs('#calendarMonthLabel');
+  if(!grid || !monthLabel) return;
+
+  const viewYear = adminCalendarCursor.getFullYear();
+  const viewMonth = adminCalendarCursor.getMonth();
+  const firstOfMonth = new Date(viewYear, viewMonth, 1);
+  const startWeekday = firstOfMonth.getDay();
+  const firstCellDate = new Date(viewYear, viewMonth, 1 - startWeekday);
+  const itemsByDay = {};
+
+  (schedules || []).forEach((s) => {
+    if(!s.start_at) return;
+    const d = new Date(s.start_at);
+    if(Number.isNaN(d.getTime())) return;
+    const key = dateKey(d);
+    if(!itemsByDay[key]) itemsByDay[key] = [];
+    itemsByDay[key].push(s);
+  });
+
+  monthLabel.textContent = new Intl.DateTimeFormat('es-AR', { month: 'long', year: 'numeric' }).format(firstOfMonth);
+  grid.innerHTML = '';
+
+  for(let i=0;i<42;i++){
+    const dayDate = new Date(firstCellDate);
+    dayDate.setDate(firstCellDate.getDate() + i);
+    const key = dateKey(dayDate);
+    const cell = document.createElement('div');
+    cell.className = 'calendar-day';
+    if(dayDate.getMonth() !== viewMonth) cell.classList.add('muted');
+
+    const header = document.createElement('div');
+    header.className = 'calendar-day-header';
+    header.textContent = new Intl.DateTimeFormat('es-AR', { weekday: 'short', day: '2-digit', month: '2-digit' }).format(dayDate);
+    cell.appendChild(header);
+
+    (itemsByDay[key] || []).forEach((s) => {
+      const item = document.createElement('div');
+      item.className = 'calendar-item';
+      const timeLabel = new Intl.DateTimeFormat('es-AR', { hour: '2-digit', minute: '2-digit' }).format(new Date(s.start_at));
+      item.textContent = `${timeLabel} · ${s.category}`;
+      cell.appendChild(item);
+    });
+
+    grid.appendChild(cell);
+  }
 }
 
 function getRole(){
@@ -272,9 +332,11 @@ async function loadSchedules(){
     return;
   }
   const counts = mapCounts(countsRes.data);
-  (schedulesRes.data || []).forEach((s) => {
+  adminSchedulesCache = (schedulesRes.data || []);
+  adminSchedulesCache.forEach((s) => {
     renderScheduleCard(container, s, counts[s.id] || 0, false);
   });
+  renderAdminCalendar(adminSchedulesCache);
 }
 
 async function addSchedule(){
@@ -346,6 +408,18 @@ window.addEventListener('DOMContentLoaded', () => {
 
   const familyLogoutBtn = qs('#familyLogoutBtn');
   if(familyLogoutBtn) familyLogoutBtn.addEventListener('click', familyLogout);
+
+  const calendarPrevBtn = qs('#calendarPrevBtn');
+  if(calendarPrevBtn) calendarPrevBtn.addEventListener('click', () => {
+    adminCalendarCursor.setMonth(adminCalendarCursor.getMonth() - 1);
+    renderAdminCalendar(adminSchedulesCache);
+  });
+
+  const calendarNextBtn = qs('#calendarNextBtn');
+  if(calendarNextBtn) calendarNextBtn.addEventListener('click', () => {
+    adminCalendarCursor.setMonth(adminCalendarCursor.getMonth() + 1);
+    renderAdminCalendar(adminSchedulesCache);
+  });
 
   updateAdminUi();
   updateFamilyUi();
