@@ -405,6 +405,10 @@ async function createFamilyUser(){
 }
 
 window.addEventListener('DOMContentLoaded', () => {
+  if(getRole() === 'admin'){
+    clearAdminSession();
+  }
+
   const reloadBtn = qs('#reloadBtn');
   if(reloadBtn) reloadBtn.addEventListener('click', loadSchedules);
 
